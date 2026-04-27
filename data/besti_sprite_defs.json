@@ -1,0 +1,13 @@
+{
+  "fogaron": {"name": "Fogaron", "types": ["fire"]},
+  "fogarox": {"name": "Fogarox", "types": ["fire"]},
+  "fogarion": {"name": "Fogarion", "types": ["fire","dragon"]},
+  "radicor": {"name": "Radicor", "types": ["nature"]},
+  "radicorso": {"name": "Radicorso", "types": ["nature"]},
+  "radicthron": {"name": "Radicthron", "types": ["nature","earth"]},
+  "canalot": {"name": "Canalot", "types": ["water"]},
+  "canalisk": {"name": "Canalisk", "types": ["water"]},
+  "canalord": {"name": "Canalord", "types": ["water","dragon"]},
+  "gabbianzo": {"name": "Gabbianzo", "types": ["air"]},
+  "gabbianator": {"name": "Gabbianator", "types": ["air"]}
+}

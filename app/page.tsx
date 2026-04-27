@@ -363,6 +363,10 @@ export default function Game() {
 
   // Dex detail view state
   const [showDexDetail, setShowDexDetail] = useState<number | null>(null)
+  
+  // Dex filters
+  const [dexFilter, setDexFilter] = useState('')
+  const [dexTypeFilter, setDexTypeFilter] = useState('')
 
   const [gs, setGs] = useState<GameState>({
     player: { name: 'Federico', x: 7, y: 9, money: 3000, badges: [], gender: 'maschio' },

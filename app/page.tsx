@@ -361,6 +361,9 @@ export default function Game() {
   const [showEvolve, setShowEvolve] = useState(false)
   const [evolvingBestia, setEvolvingBestia] = useState<PartyBestia | null>(null)
 
+  // Dex detail view state
+  const [showDexDetail, setShowDexDetail] = useState<number | null>(null)
+
   const [gs, setGs] = useState<GameState>({
     player: { name: 'Federico', x: 7, y: 9, money: 3000, badges: [], gender: 'maschio' },
     party: [],
@@ -1900,56 +1903,108 @@ export default function Game() {
   const showPokedex = () => {
     const caughtBesti = gs.flags.caughtBesti || []
     const allBesti = Object.values(BESTI)
+    const types = [...new Set(allBesti.flatMap(b => b.types))]
     
-    // Mostra tutti i besti, evidenziando quelli catturati
-    setOverlayTitle(`BESTIDEX ${caughtBesti.length}/${allBesti.length}`)
+    // Filter besti
+    const filteredBesti = allBesti.filter(b => {
+      const matchName = !dexFilter || b.name.toLowerCase().includes(dexFilter.toLowerCase())
+      const matchType = !dexTypeFilter || b.types.includes(dexTypeFilter)
+      return matchName && matchType
+    })
+    
+    setOverlayTitle('BESTIDEX')
     setOverlayContent(
-      <div className="dex-full">
-        <div className="dex-list">
-          {allBesti.map(b => {
-            const isCaught = caughtBesti.includes(b.id)
-            return (
-              <div 
-                key={b.id} 
-                className={`dex-row ${isCaught ? 'caught' : 'uncaught'}`}
-                onClick={() => {
-                  if (isCaught) {
-                    // Mostra dettagli
-                    const evol = b.ev ? BESTI[b.ev] : null
-                    setOverlayContent(
-                      <div className="dex-detail">
-                        <div className="dex-detail-header">
-                          <img src={getBestiaIcon(b.id)} className="dex-detail-sprite" alt={b.name} />
-                          <div className="dex-detail-info">
-                            <div className="dex-detail-name">{b.name}</div>
-                            <div className="dex-detail-num">#{String(b.id).padStart(3, '0')}</div>
-                            <div className="dex-detail-types">{b.types.map(t => <span key={t} className={`type-badge type-${t}`}>{t}</span>)}</div>
-                          </div>
-                        </div>
-                        <div className="dex-detail-desc">{b.desc}</div>
-                        <div className="dex-detail-stats">
-                          <div className="stat-row"><span>HP</span><span>{b.bs.hp}</span></div>
-                          <div className="stat-row"><span>ATK</span><span>{b.bs.atk}</span></div>
-                          <div className="stat-row"><span>DEF</span><span>{b.bs.def}</span></div>
-                          <div className="stat-row"><span>SPD</span><span>{b.bs.spd}</span></div>
-                        </div>
-                        {b.ev && <div className="dex-detail-ev">Evoluzione: {b.ev} (livello {b.evLvl})</div>}
-                        {b.evItem && <div className="dex-detail-ev">Evoluzione: {b.evItem}</div>}
-                        <div className="dex-detail-moves">Mosse: {b.moves.join(', ')}</div>
-                        <button className="back-btn" onClick={() => showPokedex()}>← Indietro</button>
-                      </div>
-                    )
-                  }
-                }}
-              >
-                <span className="dex-num">#{String(b.id).padStart(3, '0')}</span>
-                <img src={isCaught ? getBestiaIcon(b.id) : 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><rect fill="%23333" width="24" height="24"/><text x="12" y="16" text-anchor="middle" fill="%23666" font-size="10">?</text></svg>'} className="dex-icon" alt="" />
-                <span className="dex-name">{isCaught ? b.name : '???'}</span>
-                <span className="dex-types">{b.types.map(t => <span key={t} className={`type-badge type-${t}`}>{t}</span>)}</span>
-              </div>
-            )
-          })}
+      <div className="dex-modern">
+        <div className="dex-header">
+          <div className="dex-search">
+            <input 
+              type="text" 
+              placeholder="Cerca Besti..." 
+              value={dexFilter}
+              onChange={e => setDexFilter(e.target.value)}
+              className="dex-search-input"
+            />
+          </div>
+          <div className="dex-types-filter">
+            <button 
+              className={`type-btn ${!dexTypeFilter ? 'active' : ''}`}
+              onClick={() => setDexTypeFilter('')}
+            >Tutti</button>
+            {types.map(t => (
+              <button 
+                key={t}
+                className={`type-btn type-${t} ${dexTypeFilter === t ? 'active' : ''}`}
+                onClick={() => setDexTypeFilter(t === dexTypeFilter ? '' : t)}
+              />
+            ))}
+          </div>
+          <div className="dex-count">{caughtBesti.length}/{allBesti.length} catturati</div>
         </div>
+        
+        {!showDexDetail ? (
+          <div className="dex-grid">
+            {filteredBesti.map(b => {
+              const isCaught = caughtBesti.includes(b.id)
+              const evolution = b.ev ? BESTI[b.ev] : null
+              return (
+                <div 
+                  key={b.id} 
+                  className={`dex-card ${isCaught ? 'caught' : 'uncaught'}`}
+                  onClick={() => isCaught && setShowDexDetail(b.id)}
+                >
+                  <div className="dex-card-num">#{String(b.id).padStart(3, '0')}</div>
+                  <img 
+                    src={isCaught ? getBestiaIcon(b.id) : 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect fill="%23222" width="48" height="48"/><text x="24" y="28" text-anchor="middle" fill="%23444" font-size="12">?</text></svg>'} 
+                    className="dex-card-sprite" 
+                    alt={b.name}
+                  />
+                  <div className="dex-card-name">{isCaught ? b.name : '???'}</div>
+                  <div className="dex-card-types">
+                    {b.types.map(t => <span key={t} className={`type-badge type-${t}`}>{t}</span>)}
+                  </div>
+                  {evolution && isCaught && (
+                    <div className="dex-card-ev">→ {evolution.name}</div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="dex-detail-modern">
+            {(() => {
+              const b = BESTI[showDexDetail]
+              const isCaught = caughtBesti.includes(b.id)
+              if (!b || !isCaught) return null
+              const evolution = b.ev ? BESTI[b.ev] : null
+              return (
+                <>
+                  <button className="dex-detail-back" onClick={() => setShowDexDetail(null)}>← Indietro</button>
+                  <div className="dex-detail-content">
+                    <img src={getBestiaIcon(b.id)} className="dex-detail-sprite" alt={b.name} />
+                    <div className="dex-detail-info">
+                      <div className="dex-detail-name">{b.name}</div>
+                      <div className="dex-detail-num">#{String(b.id).padStart(3, '0')}</div>
+                      <div className="dex-detail-types">
+                        {b.types.map(t => <span key={t} className={`type-badge type-${t}`}>{t}</span>)}
+                      </div>
+                    </div>
+                    <div className="dex-detail-desc">{b.desc}</div>
+                    <div className="dex-detail-stats-grid">
+                      <div className="stat-box"><span className="stat-label">HP</span><span className="stat-value">{b.bs.hp}</span></div>
+                      <div className="stat-box"><span className="stat-label">ATK</span><span className="stat-value">{b.bs.atk}</span></div>
+                      <div className="stat-box"><span className="stat-label">DEF</span><span className="stat-value">{b.bs.def}</span></div>
+                      <div className="stat-box"><span className="stat-label">SPD</span><span className="stat-value">{b.bs.spd}</span></div>
+                    </div>
+                    {evolution && (
+                      <div className="dex-detail-ev">Evolve: {evolution.name} (Lv. {b.evLvl})</div>
+                    )}
+                    <div className="dex-detail-moves">Moves: {b.moves.join(', ')}</div>
+                  </div>
+                </>
+              )
+            })()}
+          </div>
+        )}
       </div>
     )
     setShowOverlay(true)
@@ -2111,33 +2166,46 @@ export default function Game() {
     }
   }
 
-  const showTeleport = () => {
-    soundManager.menuSelect()
-    const unlockedLocations = TELEPORT_LOCATIONS.filter(loc => 
-      isLocationUnlocked(loc, gs.player.badges, gs.storyProgress)
-    )
+const showTeleport = () => {
+    const allLocations = TELEPORT_LOCATIONS.filter(loc => {
+      if (loc.unlocked) return true
+      if (loc.unlockCondition && gs.player.badges.includes(loc.unlockCondition)) return true
+      return false
+    })
     
-    setOverlayTitle('TELEPORTO')
+    // Group by region
+    const regions = [...new Set(allLocations.map(loc => loc.region))]
+    const groupedLocations = regions.reduce((acc, region) => {
+      acc[region] = allLocations.filter(loc => loc.region === region)
+      return acc
+    }, {} as Record<string, TeleportLocation[]>)
+    
+    setOverlayTitle('TELETRASPORTO')
     setOverlayContent(
-      <div className="teleport-list">
-        {unlockedLocations.length === 0 ? (
-          <div className="teleport-empty">Nessuna località disponibile</div>
-        ) : (
-          unlockedLocations.map(loc => (
-            <div 
-              key={loc.id} 
-              className={`teleport-item ${gs.map === loc.map ? 'current' : ''}`}
-              onClick={() => teleportTo(loc)}
-            >
-              <span className="teleport-icon">{loc.icon}</span>
-              <div className="teleport-info">
-                <div className="teleport-name">{loc.name}</div>
-                <div className="teleport-desc">{loc.description}</div>
-                <div className="teleport-region">{loc.region}</div>
+      <div className="teleport-modern">
+        <div className="teleport-regions">
+          {regions.map(region => (
+            <div key={region} className="teleport-region-group">
+              <div className="teleport-region-header">{region}</div>
+              <div className="teleport-cards">
+                {groupedLocations[region].map(loc => (
+                  <div 
+                    key={loc.id} 
+                    className={`teleport-card ${gs.map === loc.map ? 'current' : ''}`}
+                    onClick={() => teleportTo(loc)}
+                  >
+                    <span className="teleport-card-icon">{loc.icon}</span>
+                    <div className="teleport-card-info">
+                      <div className="teleport-card-name">{loc.name}</div>
+                      <div className="teleport-card-desc">{loc.description}</div>
+                    </div>
+                    {gs.map === loc.map && <div className="teleport-current-badge">✓</div>}
+                  </div>
+                ))}
               </div>
             </div>
-          ))
-        )}
+          ))}
+        </div>
       </div>
     )
     setShowOverlay(true)
@@ -4648,6 +4716,279 @@ export default function Game() {
           border: none;
           border-radius: 3px;
           cursor: pointer;
+        }
+
+        /* MODERN DEX UI */
+        .dex-modern {
+          max-height: 80vh;
+          overflow-y: auto;
+        }
+
+        .dex-header {
+          margin-bottom: 15px;
+        }
+
+        .dex-search-input {
+          width: 100%;
+          padding: 10px;
+          border: 2px solid #444;
+          border-radius: 8px;
+          background: #1a1a2a;
+          color: #fff;
+          font-size: 14px;
+          margin-bottom: 10px;
+        }
+
+        .dex-types-filter {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 5px;
+          margin-bottom: 10px;
+        }
+
+        .type-btn {
+          padding: 5px 10px;
+          border-radius: 15px;
+          border: 2px solid transparent;
+          font-size: 10px;
+          cursor: pointer;
+          opacity: 0.6;
+        }
+
+        .type-btn.active {
+          opacity: 1;
+          border-color: #fff;
+        }
+
+        .dex-count {
+          font-size: 12px;
+          color: #8b8;
+          text-align: center;
+          margin-bottom: 10px;
+        }
+
+        .dex-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+        }
+
+        .dex-card {
+          background: #1a1a2a;
+          border-radius: 10px;
+          padding: 10px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .dex-card.caught {
+          background: linear-gradient(145deg, #2a2a3a, #1a1a2a);
+        }
+
+        .dex-card.uncaught {
+          opacity: 0.4;
+        }
+
+        .dex-card:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 15px rgba(139, 34, 102, 0.4);
+        }
+
+        .dex-card-num {
+          font-size: 10px;
+          color: #666;
+        }
+
+        .dex-card-sprite {
+          width: 48px;
+          height: 48px;
+          margin: 5px auto;
+        }
+
+        .dex-card-name {
+          font-size: 11px;
+          color: #fff;
+          font-weight: bold;
+          margin: 5px 0;
+        }
+
+        .dex-card-types {
+          display: flex;
+          justify-content: center;
+          gap: 3px;
+        }
+
+        .dex-card-ev {
+          font-size: 9px;
+          color: #8b8;
+          margin-top: 5px;
+        }
+
+        .dex-detail-modern {
+          background: #1a1a2a;
+          border-radius: 15px;
+          padding: 20px;
+        }
+
+        .dex-detail-back {
+          background: transparent;
+          border: 2px solid #444;
+          color: #aaa;
+          padding: 8px 15px;
+          border-radius: 20px;
+          cursor: pointer;
+          margin-bottom: 15px;
+        }
+
+        .dex-detail-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .dex-detail-sprite {
+          width: 96px;
+          height: 96px;
+        }
+
+        .dex-detail-info {
+          text-align: center;
+        }
+
+        .dex-detail-name {
+          font-size: 24px;
+          font-weight: bold;
+          color: #fff;
+        }
+
+        .dex-detail-num {
+          font-size: 14px;
+          color: #666;
+          margin-bottom: 5px;
+        }
+
+        .dex-detail-types {
+          display: flex;
+          gap: 5px;
+          justify-content: center;
+          margin-bottom: 10px;
+        }
+
+        .dex-detail-desc {
+          font-size: 13px;
+          color: #aaa;
+          text-align: center;
+          line-height: 1.5;
+        }
+
+        .dex-detail-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          width: 100%;
+        }
+
+        .stat-box {
+          background: #2a2a3a;
+          border-radius: 8px;
+          padding: 10px;
+          text-align: center;
+        }
+
+        .stat-label {
+          font-size: 10px;
+          color: #666;
+          display: block;
+        }
+
+        .stat-value {
+          font-size: 18px;
+          color: #fff;
+          font-weight: bold;
+        }
+
+        .dex-detail-ev, .dex-detail-moves {
+          font-size: 11px;
+          color: #8b8;
+        }
+
+        /* MODERN TELEPORT UI */
+        .teleport-modern {
+          max-height: 80vh;
+          overflow-y: auto;
+        }
+
+        .teleport-region-group {
+          margin-bottom: 20px;
+        }
+
+        .teleport-region-header {
+          font-size: 14px;
+          color: #8b2266;
+          font-weight: bold;
+          margin-bottom: 10px;
+          padding-bottom: 5px;
+          border-bottom: 2px solid #333;
+        }
+
+        .teleport-cards {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+
+        .teleport-card {
+          background: #1a1a2a;
+          border-radius: 10px;
+          padding: 15px;
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .teleport-card:hover {
+          transform: scale(1.02);
+          background: #2a2a3a;
+        }
+
+        .teleport-card.current {
+          border: 2px solid #8b2266;
+          background: linear-gradient(145deg, #2a2a3a, #1a1a2a);
+        }
+
+        .teleport-card-icon {
+          font-size: 24px;
+        }
+
+        .teleport-card-info {
+          flex: 1;
+        }
+
+        .teleport-card-name {
+          font-size: 12px;
+          color: #fff;
+          font-weight: bold;
+        }
+
+        .teleport-card-desc {
+          font-size: 9px;
+          color: #666;
+        }
+
+        .teleport-current-badge {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          background: #8b2266;
+          color: #fff;
+          font-size: 10px;
+          padding: 2px 6px;
+          border-radius: 10px;
         }
 
         .dex-entry {

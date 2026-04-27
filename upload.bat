@@ -1,6 +1,7 @@
 @echo off
 cd G:\baxk\poke-main
-gh repo create poke2 --public --source=. --description "Pokemona sprites"
+git remote remove origin 2>nul
+git remote add origin https://github.com/MARIOVIO01/poke2.git
 git config user.email "federico@poke.com"
 git config user.name "Federico"
 git add -A

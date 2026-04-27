@@ -3101,7 +3101,7 @@ const showTeleport = () => {
                   <div className="overlay-content">
                     {inMenu ? (
                       <div className="menu-options">
-                        {['Squadra', 'Zaino', 'BestiDex', 'Teletrasporto', 'Trofei', 'Salva', 'Carica', 'Chiudi'].map((label, index) => (
+                        {['Squadra', 'Zaino', 'PokeDioex', 'Teletrasporto', 'Trofei', 'Salva', 'Carica', 'Chiudi'].map((label, index) => (
                           <div
                             key={label}
                             className={`menu-option ${menuSelection === index ? 'selected' : ''}`}

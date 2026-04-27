@@ -95,11 +95,11 @@ export const npcMove = (
   
   if (!shouldMove) return null
   
-  const movements: Record<string, { x: number; y: number }> = {
-    up: { x: 0, y: -1 },
-    down: { x: 0, y: 1 },
-    left: { x: -1, y: 0 },
-    right: { x: 1, y: 0 }
+  const movements: Record<string, { x: number; y: number; direction: string }> = {
+    up: { x: 0, y: -1, direction: 'up' },
+    down: { x: 0, y: 1, direction: 'down' },
+    left: { x: -1, y: 0, direction: 'left' },
+    right: { x: 1, y: 0, direction: 'right' }
   }
   
   return movements[npc.direction] || null

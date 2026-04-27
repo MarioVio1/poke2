@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 import json, os, random
 from PIL import Image, ImageDraw
 
@@ -34,10 +35,11 @@ def generate_image(name, colors, size=64):
     return img
 
 def main():
-    data_path = 'data/besti_sprite_defs.json'
+    base = r"G:\baxk\poke-main"
+    data_path = os.path.join(base, 'data', 'besti_sprite_defs.json')
     with open(data_path, 'r', encoding='utf-8') as f:
         defs = json.load(f)
-    outdir = 'public/sprites/pngs'
+    outdir = os.path.join(base, 'public', 'sprites', 'pngs')
     ensure_dir(outdir)
     for key, defn in defs.items():
         name = defn.get('name', key)

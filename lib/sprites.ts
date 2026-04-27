@@ -1,6 +1,4 @@
-// Besti Sprites - Uses PNG images from public/sprites/
-// If no PNG found, falls back to generated SVG
-
+// Besti Sprites - Uses PNG images from public/sprites/pngs/
 export interface SpriteData {
   front: string
   back: string
@@ -8,20 +6,45 @@ export interface SpriteData {
   shiny?: string
 }
 
-export const BESTI_SVG_SPRITES: Record<string, SpriteData> = {
-  fogaron: { front: '/sprites/pngs/fogaron.png', back: '/sprites/pngs/fogaron.png', icon: '/sprites/pngs/fogaron.png' },
-  fogarox: { front: '/sprites/pngs/fogarox.png', back: '/sprites/pngs/fogarox.png', icon: '/sprites/pngs/fogarox.png' },
-  fogarion: { front: '/sprites/pngs/fogarion.png', back: '/sprites/pngs/fogarion.png', icon: '/sprites/pngs/fogarion.png' },
-  radiccor: { front: '/sprites/pngs/radiccor.png', back: '/sprites/pngs/radiccor.png', icon: '/sprites/pngs/radiccor.png' },
-  radicorso: { front: '/sprites/pngs/radicorso.png', back: '/sprites/pngs/radicorso.png', icon: '/sprites/pngs/radicorso.png' },
-  radicthron: { front: '/sprites/pngs/radicthron.png', back: '/sprites/pngs/radicthron.png', icon: '/sprites/pngs/radicthron.png' },
-  canalot: { front: '/sprites/pngs/canalot.png', back: '/sprites/pngs/canalot.png', icon: '/sprites/pngs/canalot.png' },
-  canalisk: { front: '/sprites/pngs/canalisk.png', back: '/sprites/pngs/canalisk.png', icon: '/sprites/pngs/canalisk.png' },
-  canalord: { front: '/sprites/pngs/canalord.png', back: '/sprites/pngs/canalord.png', icon: '/sprites/pngs/canalord.png' },
-  gabbianzo: { front: '/sprites/pngs/gabbianzo.png', back: '/sprites/pngs/gabbianzo.png', icon: '/sprites/pngs/gabbianzo.png' },
-  gabbianator: { front: '/sprites/pngs/gabbianator.png', back: '/sprites/pngs/gabbianator.png', icon: '/sprites/pngs/gabbianator.png' },
-  // add more as you generate
-}
+// Get all PNG sprite paths dynamically
+const getSpritePath = (name: string): string => `/sprites/pngs/${name.toLowerCase().replace(/\s+/g, '')}.png`
+
+// Auto-generate sprite entries for all known besti
+const allBesti = [
+  'fogaron', 'fogarox', 'fogarion',
+  'radiccor', 'radicorso', 'radicthron',
+  'canalot', 'canalisk', 'canalord',
+  'gabbianzo', 'gabbianator',
+  'polentaur', 'polentitan',
+  'spritzino', 'spritzilla',
+  'gondolo', 'gondrago',
+  'salamix', 'salamastro',
+  'prosecchino', 'prosecchione',
+  'mascarin', 'mascarion',
+  'vespolo', 'vespatron',
+  'nevelet', 'dolomor',
+  'alpibex', 'dolomibex',
+  'lagunello', 'lagunaga',
+  'smogatto', 'fumigor',
+  'colombo', 'colombarion',
+  'tiramisu', 'tiramisuper',
+  'vignel', 'vignarbor',
+  'formaggion', 'parmageddon',
+  'focacino', 'scampetto',
+  'risotto', 'porchetta', 'spritzatore',
+  'bacaro', 'topogranchio', 'fantasma', 'fiore',
+  'dolomitor', 'lagorion', 'serenissima', 'ombradspritz', 'dux'
+]
+
+export const BESTI_SVG_SPRITES: Record<string, SpriteData> = {}
+
+allBesti.forEach(id => {
+  BESTI_SVG_SPRITES[id] = {
+    front: getSpritePath(id),
+    back: getSpritePath(id),
+    icon: getSpritePath(id)
+  }
+})
 
 // Helper per creare SVG (fallback)
 const createSvg = (content: string, width = 96, height = 96): string => 

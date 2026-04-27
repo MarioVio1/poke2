@@ -31,13 +31,13 @@ body {
 }
 
 .gba-console {
-  background: linear-gradient(180deg, #4a3a6a 0%, #2a2a4a 50%, #1a1a2a 100%);
-  border-radius: 12px 12px 40px 40px;
-  padding: 20px;
+  background: linear-gradient(180deg, #5a4a8a 0%, #3a3a5a 50%, #252545 100%);
+  border-radius: 15px 15px 45px 45px;
+  padding: 25px;
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.8),
-    inset 0 1px 3px rgba(255, 255, 255, 0.1),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.4);
+    0 25px 80px rgba(0, 0, 0, 0.9),
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.5);
   position: relative;
   border: 4px solid #1a1a2a;
 }
@@ -45,68 +45,99 @@ body {
 .gba-console::before {
   content: '';
   position: absolute;
-  top: 10px;
-  left: 20px;
-  width: 8px;
-  height: 8px;
+  top: 12px;
+  left: 25px;
+  width: 10px;
+  height: 10px;
   background: #00ff00;
   border-radius: 50%;
-  box-shadow: 0 0 8px #00ff00, 0 0 15px #00ff00;
+  box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
   animation: power-led 2s ease-in-out infinite;
 }
 
+.gba-console::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 25px;
+  width: 40px;
+  height: 6px;
+  background: linear-gradient(90deg, #222, #444, #222);
+  border-radius: 3px;
+}
+
 @keyframes power-led {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px #00ff00, 0 0 15px #00ff00; }
-  50% { opacity: 0.7; box-shadow: 0 0 4px #00ff00, 0 0 8px #00ff00; }
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; }
+  50% { opacity: 0.6; box-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; }
 }
 
 .screen-bezel {
   background: #0a0a0a;
-  border-radius: 6px;
-  padding: 10px;
+  border-radius: 8px;
+  padding: 12px;
   box-shadow: 
-    inset 0 4px 20px rgba(0, 0, 0, 1),
+    inset 0 5px 25px rgba(0, 0, 0, 1),
     0 1px 2px rgba(255, 255, 255, 0.05);
-  border: 3px solid #111;
+  border: 4px solid #222;
   position: relative;
 }
 
 .screen-bezel::before {
   content: 'POKEMONA';
   position: absolute;
-  top: -10px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 5px;
-  color: #444;
+  font-size: 6px;
+  color: #555;
   font-family: 'Press Start 2P', cursive;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
   text-transform: uppercase;
+  z-index: 10;
 }
 
 .screen-bezel::after {
   content: '';
   position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 20px;
-  height: 8px;
-  background: linear-gradient(90deg, #111, #222, #111);
+  top: 12px;
+  left: 12px;
+  width: 25px;
+  height: 10px;
+  background: linear-gradient(90deg, #111, #333, #111);
   border-radius: 2px;
 }
 
 .game-container {
   position: relative;
   background: #000;
-  border: 2px solid #111;
-  border-radius: 3px;
+  border: 3px solid #0a0a0a;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 1);
 }
 
 .game-canvas {
   display: block;
   image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  background: #000;
+  position: relative;
+}
+
+.game-canvas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1) 0px,
+    rgba(0, 0, 0, 0.1) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
   background: #000;
   position: relative;
 }
@@ -281,7 +312,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(180deg, #88c8d8 0%, #a8e0c8 50%, #78c078 100%);
+  background: linear-gradient(180deg, #7ab8d8 0%, #68c0a8 50%, #58a878 100%);
   display: none;
   z-index: 30;
 }
@@ -294,11 +325,22 @@ body {
   right: 0;
   bottom: 0;
   background: 
-    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px);
   background-size: 4px 4px;
   pointer-events: none;
-  opacity: 0.3;
+  opacity: 0.4;
+}
+
+.battle-ui::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(0deg, rgba(30,80,50,0.3) 0%, transparent 100%);
+  pointer-events: none;
 }
 
 .battle-hud {

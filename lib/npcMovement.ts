@@ -59,7 +59,8 @@ export const NPC_MOVEMENTS = {
     return true
   },
   
-  follow: (npc: MovingNPC, playerX: number, playerY: number, now: number): boolean => {
+  follow: (npc: MovingNPC, now: number, playerX?: number, playerY?: number): boolean => {
+    if (playerX === undefined || playerY === undefined) return false
     const dist = Math.abs(playerX - npc.x) + Math.abs(playerY - npc.y)
     if (dist < 2 || dist > 8) return false
     if (now - npc.lastMove < 1000) return false
@@ -88,8 +89,8 @@ export const npcMove = (
   const moveFunc = NPC_MOVEMENTS[type]
   if (!moveFunc) return null
   
-  const shouldMove = type === 'follow' && playerX !== undefined && playerY !== undefined
-    ? moveFunc({ ...npc, x: playerX, y: playerY } as MovingNPC, now || 0)
+  const shouldMove = type === 'follow'
+    ? moveFunc(npc as MovingNPC, now || 0, playerX, playerY)
     : moveFunc(npc as MovingNPC, now || 0)
   
   if (!shouldMove) return null
